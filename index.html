@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WLift Pro - Advanced Weightlifting Tracker</title>
+    <title>WLift - Advanced Weightlifting Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #6C63FF;
@@ -24,7 +24,7 @@
             --success: #48bb78;
             --warning: #ecc94b;
             --danger: #e53e3e;
-            --card-bg: #1e293b;
+            --card-bg: rgba(30, 41, 59, 0.8);
             --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             --border-radius: 16px;
@@ -39,7 +39,7 @@
         }
 
         body {
-            background: radial-gradient(circle at top right, var(--darker) 0%, var(--dark) 70%);
+            background: linear-gradient(135deg, var(--darker), var(--dark));
             color: var(--light);
             min-height: 100vh;
             padding: 20px;
@@ -102,24 +102,6 @@
             transform: rotate(-15deg);
             box-shadow: var(--glow);
             animation: pulse 2s infinite, rotate 20s infinite linear;
-        }
-
-        .logo-text {
-            position: relative;
-        }
-
-        .logo-text:after {
-            content: 'PRO';
-            position: absolute;
-            top: -10px;
-            right: -30px;
-            background: var(--secondary);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            animation: pulse 2s infinite;
         }
 
         .actions {
@@ -221,6 +203,7 @@
             animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .card:before {
@@ -332,6 +315,9 @@
         .workout-exercise {
             font-weight: 600;
             color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .workout-date {
@@ -680,6 +666,84 @@
             transform: scale(1.1);
         }
 
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .filter-label {
+            color: var(--light-gray);
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 2px solid var(--gray);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--light);
+        }
+
+        .progress-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 5px;
+        }
+
+        .view-option {
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-option.active {
+            background: var(--primary);
+        }
+
+        .exercise-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 5px;
+            flex-wrap: wrap;
+        }
+
+        .time-option {
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .time-option.active {
+            background: var(--primary);
+        }
+
         /* Animations */
         @keyframes slideDown {
             from {
@@ -852,6 +916,34 @@
             font-size: 1.5rem;
             color: var(--accent);
         }
+
+        .exercise-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+        }
+
+        .icon-container {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -862,7 +954,7 @@
         <header>
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-dumbbell"></i></div>
-                <div class="logo-text">WLift</div>
+                <h1>WLift</h1>
             </div>
             <div class="actions">
                 <button class="btn btn-accent" id="exportBtn">
@@ -883,13 +975,13 @@
                         <label for="exercise">Exercise</label>
                         <select id="exercise" required>
                             <option value="">Select Exercise</option>
-                            <option value="Bench Press">Bench Press</option>
-                            <option value="Squat">Squat</option>
-                            <option value="Deadlift">Deadlift</option>
-                            <option value="Overhead Press">Overhead Press</option>
-                            <option value="Pull Up">Pull Up</option>
-                            <option value="Bicep Curl">Bicep Curl</option>
-                            <option value="Tricep Extension">Tricep Extension</option>
+                            <option value="Bench Press" data-icon="fa-dumbbell">Bench Press</option>
+                            <option value="Squat" data-icon="fa-running">Squat</option>
+                            <option value="Deadlift" data-icon="fa-weight-hanging">Deadlift</option>
+                            <option value="Overhead Press" data-icon="fa-hand-paper">Overhead Press</option>
+                            <option value="Pull Up" data-icon="fa-arrow-up">Pull Up</option>
+                            <option value="Bicep Curl" data-icon="fa-hand-point-up">Bicep Curl</option>
+                            <option value="Tricep Extension" data-icon="fa-hand-point-down">Tricep Extension</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -926,11 +1018,17 @@
 
             <!-- Recent Workouts Card -->
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2 class="card-title"><i class="fas fa-history"></i> Recent Workouts</h2>
                     <button class="btn btn-secondary" id="addExerciseBtn" style="padding: 8px 15px;">
                         <i class="fas fa-plus"></i> Add Exercise
                     </button>
+                </div>
+                <div class="filter-bar">
+                    <span class="filter-label">Filter:</span>
+                    <select id="exerciseFilter" class="filter-select">
+                        <option value="all">All Exercises</option>
+                    </select>
                 </div>
                 <div class="workout-list" id="workoutList">
                     <!-- Workout items will be dynamically added here -->
@@ -939,7 +1037,26 @@
 
             <!-- Stats Card -->
             <div class="card">
-                <h2 class="card-title"><i class="fas fa-chart-line"></i> Progress Overview</h2>
+                <div class="graph-header">
+                    <h2 class="card-title"><i class="fas fa-chart-line"></i> Progress Overview</h2>
+                    <div class="time-range-selector">
+                        <div class="time-option active" data-days="7">1 Week</div>
+                        <div class="time-option" data-days="30">1 Month</div>
+                        <div class="time-option" data-days="90">3 Months</div>
+                        <div class="time-option" data-days="180">6 Months</div>
+                        <div class="time-option" data-days="365">1 Year</div>
+                        <div class="time-option" data-days="max">Max</div>
+                    </div>
+                </div>
+                <div class="progress-controls">
+                    <div class="view-toggle">
+                        <div class="view-option active" id="allView">All</div>
+                        <div class="view-option" id="exerciseView">By Exercise</div>
+                    </div>
+                    <select id="chartExerciseFilter" style="display: none;">
+                        <option value="all">Select Exercise</option>
+                    </select>
+                </div>
                 <div class="chart-container">
                     <canvas id="progressChart"></canvas>
                 </div>
@@ -950,9 +1067,9 @@
                         <div class="stat-label" id="maxWeightExercise">-</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">One Rep Max</div>
-                        <div class="stat-value" id="oneRepMax">0 kg</div>
-                        <div class="stat-label">Estimated</div>
+                        <div class="stat-label">Performance Score</div>
+                        <div class="stat-value" id="performanceScore">0</div>
+                        <div class="stat-label">Current</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Workouts</div>
@@ -971,7 +1088,12 @@
 
             <!-- Custom Exercises Card -->
             <div class="card">
-                <h2 class="card-title"><i class="fas fa-dumbbell"></i> Custom Exercises</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 class="card-title"><i class="fas fa-dumbbell"></i> Custom Exercises</h2>
+                    <button class="btn btn-danger" id="clearExercisesBtn" style="padding: 8px 15px;">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
                 <div id="customExercisesList">
                     <!-- Custom exercises will be added here -->
                 </div>
@@ -1005,9 +1127,9 @@
 
             <!-- Volume History Card -->
             <div class="card">
-                <h2 class="card-title"><i class="fas fa-weight"></i> Volume History</h2>
+                <h2 class="card-title"><i class="fas fa-weight"></i> Performance History</h2>
                 <div class="chart-container">
-                    <canvas id="volumeChart"></canvas>
+                    <canvas id="performanceChart"></canvas>
                 </div>
             </div>
 
@@ -1066,12 +1188,33 @@
         let customExercises = JSON.parse(localStorage.getItem('customExercises')) || [];
         let focusOnForm = false;
         let hurt = false;
+        let currentExerciseFilter = "all";
+        let chartViewMode = "all"; // "all" or "exercise"
+        let currentTimeRange = 7; // Default to 1 week
+        
+        // Exercise icons mapping
+        const exerciseIcons = {
+            "Bench Press": "fa-dumbbell",
+            "Squat": "fa-running",
+            "Deadlift": "fa-weight-hanging",
+            "Overhead Press": "fa-hand-paper",
+            "Pull Up": "fa-arrow-up",
+            "Bicep Curl": "fa-hand-point-up",
+            "Tricep Extension": "fa-hand-point-down",
+            "Chest": "fa-heart",
+            "Back": "fa-arrows-alt-h",
+            "Legs": "fa-walking",
+            "Shoulders": "fa-user",
+            "Arms": "fa-hand-rock",
+            "Core": "fa-circle",
+            "Other": "fa-dot-circle"
+        };
         
         // DOM Elements
         const workoutForm = document.getElementById('workoutForm');
         const workoutList = document.getElementById('workoutList');
         const progressChartCtx = document.getElementById('progressChart');
-        const volumeChartCtx = document.getElementById('volumeChart');
+        const performanceChartCtx = document.getElementById('performanceChart');
         const modal = document.getElementById('importExportModal');
         const closeModal = document.querySelector('.close-modal');
         const exportBtn = document.getElementById('exportBtn');
@@ -1091,12 +1234,19 @@
         const customExercisesList = document.getElementById('customExercisesList');
         const prList = document.getElementById('prList');
         const floatingBtn = document.getElementById('floatingBtn');
+        const exerciseFilter = document.getElementById('exerciseFilter');
+        const chartExerciseFilter = document.getElementById('chartExerciseFilter');
+        const allViewBtn = document.getElementById('allView');
+        const exerciseViewBtn = document.getElementById('exerciseView');
+        const clearExercisesBtn = document.getElementById('clearExercisesBtn');
+        const exerciseSelect = document.getElementById('exercise');
+        const timeOptions = document.querySelectorAll('.time-option');
         
         // Initialize date to today
         document.getElementById('date').valueAsDate = new Date();
         
         // Chart initialization
-        let progressChart, volumeChart;
+        let progressChart, performanceChart;
         
         // Create animated particles
         function createParticles() {
@@ -1128,6 +1278,76 @@
                 
                 particlesContainer.appendChild(particle);
             }
+        }
+        
+        // Populate exercise dropdown with icons
+        function populateExerciseDropdown() {
+            // Add default exercises
+            const exercises = [
+                {name: "Bench Press", icon: "fa-dumbbell"},
+                {name: "Squat", icon: "fa-running"},
+                {name: "Deadlift", icon: "fa-weight-hanging"},
+                {name: "Overhead Press", icon: "fa-hand-paper"},
+                {name: "Pull Up", icon: "fa-arrow-up"},
+                {name: "Bicep Curl", icon: "fa-hand-point-up"},
+                {name: "Tricep Extension", icon: "fa-hand-point-down"}
+            ];
+            
+            // Add custom exercises
+            customExercises.forEach(exercise => {
+                exercises.push({
+                    name: exercise.name,
+                    icon: exerciseIcons[exercise.category] || "fa-dot-circle"
+                });
+            });
+            
+            // Clear and repopulate dropdown
+            exerciseSelect.innerHTML = '<option value="">Select Exercise</option>';
+            
+            exercises.forEach(exercise => {
+                const option = document.createElement('option');
+                option.value = exercise.name;
+                option.dataset.icon = exercise.icon;
+                
+                const iconSpan = document.createElement('span');
+                iconSpan.className = `exercise-option`;
+                iconSpan.innerHTML = `
+                    <div class="icon-container">
+                        <i class="fas ${exercise.icon}"></i>
+                    </div>
+                    ${exercise.name}
+                `;
+                
+                option.appendChild(iconSpan);
+                exerciseSelect.appendChild(option);
+            });
+        }
+        
+        // Calculate performance score (weight * reps)
+        function calculatePerformanceScore(weight, reps) {
+            return (weight * reps).toFixed(1);
+        }
+        
+        // Populate exercise filters
+        function populateExerciseFilters() {
+            // Get all unique exercises
+            const allExercises = [...new Set([...workouts.map(w => w.exercise), ...customExercises.map(e => e.name)])];
+            
+            // Clear and repopulate filters
+            exerciseFilter.innerHTML = '<option value="all">All Exercises</option>';
+            chartExerciseFilter.innerHTML = '<option value="all">All Exercises</option>';
+            
+            allExercises.forEach(exercise => {
+                const option1 = document.createElement('option');
+                option1.value = exercise;
+                option1.textContent = exercise;
+                exerciseFilter.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = exercise;
+                option2.textContent = exercise;
+                chartExerciseFilter.appendChild(option2);
+            });
         }
         
         // Toggle button functionality
@@ -1167,14 +1387,12 @@
                 customExercises.push(exercise);
                 localStorage.setItem('customExercises', JSON.stringify(customExercises));
                 
-                // Add to exercise dropdown
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                document.getElementById('exercise').appendChild(option);
+                // Update exercises dropdown
+                populateExerciseDropdown();
                 
-                // Update custom exercises list
+                // Update custom exercises list and filters
                 renderCustomExercises();
+                populateExerciseFilters();
                 
                 addExerciseForm.style.display = 'none';
                 document.getElementById('newExerciseName').value = '';
@@ -1182,6 +1400,18 @@
                 showToast('Exercise added successfully!');
             } else {
                 showToast('Please enter an exercise name', 'error');
+            }
+        });
+        
+        // Clear all custom exercises
+        clearExercisesBtn.addEventListener('click', () => {
+            if (customExercises.length > 0 && confirm('Are you sure you want to delete all custom exercises?')) {
+                customExercises = [];
+                localStorage.setItem('customExercises', JSON.stringify(customExercises));
+                renderCustomExercises();
+                populateExerciseDropdown();
+                populateExerciseFilters();
+                showToast('All custom exercises deleted!');
             }
         });
         
@@ -1200,11 +1430,16 @@
             }
             
             customExercises.forEach(exercise => {
+                const icon = exerciseIcons[exercise.category] || "fa-dot-circle";
+                
                 const exerciseEl = document.createElement('div');
-                exerciseEl.className = 'custom-exercise';
+                exerciseEl.className = 'custom-exercise fade-in';
                 exerciseEl.innerHTML = `
                     <div>
-                        <div>${exercise.name}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas ${icon}"></i>
+                            <div>${exercise.name}</div>
+                        </div>
                         <div class="exercise-tag tag-custom">${exercise.category}</div>
                     </div>
                     <div class="custom-exercise-actions">
@@ -1231,16 +1466,9 @@
                 customExercises = customExercises.filter(e => e.id !== id);
                 localStorage.setItem('customExercises', JSON.stringify(customExercises));
                 
-                // Remove from dropdown
-                const select = document.getElementById('exercise');
-                for (let i = 0; i < select.options.length; i++) {
-                    if (select.options[i].value === exercise.name) {
-                        select.remove(i);
-                        break;
-                    }
-                }
-                
                 renderCustomExercises();
+                populateExerciseDropdown();
+                populateExerciseFilters();
                 showToast('Exercise deleted!');
             }
         }
@@ -1264,7 +1492,11 @@
                 reps: parseInt(document.getElementById('reps').value),
                 focusOnForm: focusOnForm,
                 hurt: hurt,
-                notes: document.getElementById('notes').value || ''
+                notes: document.getElementById('notes').value || '',
+                performanceScore: calculatePerformanceScore(
+                    parseFloat(document.getElementById('weight').value),
+                    parseInt(document.getElementById('reps').value)
+                )
             };
             
             workouts.unshift(workout);
@@ -1273,6 +1505,7 @@
             updateCharts();
             updateStats();
             updatePersonalRecords();
+            populateExerciseFilters();
             showToast('Workout saved successfully!');
             
             // Reset form
@@ -1301,25 +1534,41 @@
         function renderWorkouts() {
             workoutList.innerHTML = '';
             
-            if (workouts.length === 0) {
+            let filteredWorkouts = workouts;
+            
+            // Apply exercise filter if not "all"
+            if (currentExerciseFilter !== "all") {
+                filteredWorkouts = workouts.filter(w => w.exercise === currentExerciseFilter);
+            }
+            
+            if (filteredWorkouts.length === 0) {
+                const noDataText = currentExerciseFilter === "all" ? 
+                    "No workouts recorded yet" : 
+                    `No workouts for ${currentExerciseFilter} yet`;
+                    
                 workoutList.innerHTML = `
                     <div class="empty-state">
                         <div><i class="fas fa-dumbbell"></i></div>
-                        <h3>No workouts recorded yet</h3>
+                        <h3>${noDataText}</h3>
                         <p>Add your first workout to get started!</p>
                     </div>
                 `;
                 return;
             }
             
-            const recentWorkouts = workouts.slice(0, 5);
+            const recentWorkouts = filteredWorkouts.slice(0, 5);
             
             recentWorkouts.forEach(workout => {
+                const exerciseIcon = exerciseIcons[workout.exercise] || "fa-dumbbell";
+                
                 const workoutEl = document.createElement('div');
-                workoutEl.className = 'workout-item';
+                workoutEl.className = 'workout-item fade-in';
                 workoutEl.innerHTML = `
                     <div class="workout-header">
-                        <div class="workout-exercise">${workout.exercise}</div>
+                        <div class="workout-exercise">
+                            <i class="fas ${exerciseIcon}"></i>
+                            ${workout.exercise}
+                        </div>
                         <div class="workout-date">${formatDate(workout.date)}</div>
                     </div>
                     <div class="workout-details">
@@ -1332,8 +1581,8 @@
                             <div class="detail-label">Reps</div>
                         </div>
                         <div class="workout-detail">
-                            <div class="detail-value">${calculateOneRepMax(workout.weight, workout.reps).toFixed(1)}</div>
-                            <div class="detail-label">1RM</div>
+                            <div class="detail-value">${workout.performanceScore}</div>
+                            <div class="detail-label">Score</div>
                         </div>
                     </div>
                     ${workout.notes ? `<div class="workout-notes" style="margin-top:10px; color:#a0aec0; font-size:0.9rem">${workout.notes}</div>` : ''}
@@ -1355,42 +1604,129 @@
             });
         }
         
+        function getDateRange(days) {
+            const dates = [];
+            const today = new Date();
+            const startDate = new Date();
+            
+            if (days === 'max') {
+                if (workouts.length === 0) {
+                    // Default to 30 days if no workouts
+                    startDate.setDate(today.getDate() - 30);
+                } else {
+                    // Get earliest workout date
+                    const workoutDates = workouts.map(w => new Date(w.date));
+                    startDate.setTime(Math.min(...workoutDates));
+                }
+            } else {
+                startDate.setDate(today.getDate() - days);
+            }
+            
+            const currentDate = new Date(startDate);
+            while (currentDate <= today) {
+                dates.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return dates;
+        }
+        
         function initCharts() {
             // Destroy existing charts if they exist
             if (progressChart) progressChart.destroy();
-            if (volumeChart) volumeChart.destroy();
+            if (performanceChart) performanceChart.destroy();
             
-            // Get last 7 days
-            const last7Days = getLastNDays(7);
+            // Get date range based on selected time range
+            const dateRange = getDateRange(currentTimeRange);
             
             // Prepare data for progress chart
-            const exerciseTypes = [...new Set(workouts.map(w => w.exercise))].slice(0, 3);
-            const datasets = exerciseTypes.map(exercise => {
-                const data = last7Days.map(day => {
-                    const dayWorkouts = workouts.filter(w => 
-                        w.exercise === exercise && w.date === day
-                    );
-                    if (dayWorkouts.length === 0) return null;
-                    
-                    // Get max weight for that day
-                    return Math.max(...dayWorkouts.map(w => w.weight));
-                });
+            let datasets = [];
+            
+            if (chartViewMode === "all") {
+                const exerciseTypes = [...new Set(workouts.map(w => w.exercise))].slice(0, 3);
                 
-                return {
-                    label: exercise,
-                    data: data,
-                    borderColor: getRandomColor(),
-                    backgroundColor: 'rgba(108, 99, 255, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                };
-            });
+                datasets = exerciseTypes.map(exercise => {
+                    const data = dateRange.map(date => {
+                        const dateWorkouts = workouts.filter(w => 
+                            w.exercise === exercise && w.date === date
+                        );
+                        if (dateWorkouts.length === 0) return null;
+                        
+                        // Get max performance score for that day
+                        return Math.max(...dateWorkouts.map(w => parseFloat(w.performanceScore)));
+                    });
+                    
+                    return {
+                        label: exercise,
+                        data: data,
+                        borderColor: getRandomColor(),
+                        backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2,
+                        borderWidth: 3
+                    };
+                });
+            } else {
+                const selectedExercise = chartExerciseFilter.value;
+                
+                if (selectedExercise !== "all") {
+                    const data = dateRange.map(date => {
+                        const dateWorkouts = workouts.filter(w => 
+                            w.exercise === selectedExercise && w.date === date
+                        );
+                        if (dateWorkouts.length === 0) return null;
+                        
+                        // Get max performance score for that day
+                        return Math.max(...dateWorkouts.map(w => parseFloat(w.performanceScore)));
+                    });
+                    
+                    datasets = [{
+                        label: selectedExercise,
+                        data: data,
+                        borderColor: '#42DED1',
+                        backgroundColor: 'rgba(66, 222, 209, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2,
+                        borderWidth: 3
+                    }];
+                } else {
+                    // Default to first exercise if none selected
+                    const firstExercise = [...new Set(workouts.map(w => w.exercise))][0] || "Bench Press";
+                    const data = dateRange.map(date => {
+                        const dateWorkouts = workouts.filter(w => 
+                            w.exercise === firstExercise && w.date === date
+                        );
+                        if (dateWorkouts.length === 0) return null;
+                        
+                        return Math.max(...dateWorkouts.map(w => parseFloat(w.performanceScore)));
+                    });
+                    
+                    datasets = [{
+                        label: firstExercise,
+                        data: data,
+                        borderColor: '#42DED1',
+                        backgroundColor: 'rgba(66, 222, 209, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2,
+                        borderWidth: 3
+                    }];
+                }
+            }
             
             // Progress Chart
             progressChart = new Chart(progressChartCtx, {
                 type: 'line',
                 data: {
-                    labels: last7Days.map(d => formatDate(d, true)),
+                    labels: dateRange.map(d => formatDate(d, true)),
                     datasets: datasets
                 },
                 options: {
@@ -1402,6 +1738,11 @@
                             labels: {
                                 color: '#cbd5e0'
                             }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Performance Score Over Time',
+                            color: '#f0f0f0'
                         }
                     },
                     scales: {
@@ -1412,6 +1753,11 @@
                             },
                             ticks: {
                                 color: '#a0aec0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Performance Score',
+                                color: '#a0aec0'
                             }
                         },
                         x: {
@@ -1419,6 +1765,11 @@
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
+                                color: '#a0aec0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date',
                                 color: '#a0aec0'
                             }
                         }
@@ -1430,21 +1781,21 @@
                 }
             });
             
-            // Volume Chart
-            const volumeData = last7Days.map(day => {
-                const dayWorkouts = workouts.filter(w => w.date === day);
-                return dayWorkouts.reduce((sum, workout) => 
-                    sum + (workout.weight * workout.reps), 0
+            // Performance Chart
+            const performanceData = dateRange.map(date => {
+                const dateWorkouts = workouts.filter(w => w.date === date);
+                return dateWorkouts.reduce((sum, workout) => 
+                    sum + parseFloat(workout.performanceScore), 0
                 );
             });
             
-            volumeChart = new Chart(volumeChartCtx, {
+            performanceChart = new Chart(performanceChartCtx, {
                 type: 'bar',
                 data: {
-                    labels: last7Days.map(d => formatDate(d, true)),
+                    labels: dateRange.map(d => formatDate(d, true)),
                     datasets: [{
-                        label: 'Total Volume (kg)',
-                        data: volumeData,
+                        label: 'Daily Performance Score',
+                        data: performanceData,
                         backgroundColor: 'rgba(66, 222, 209, 0.7)',
                         borderColor: 'rgba(66, 222, 209, 1)',
                         borderWidth: 1
@@ -1456,6 +1807,11 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Daily Performance Score',
+                            color: '#f0f0f0'
                         }
                     },
                     scales: {
@@ -1466,6 +1822,11 @@
                             },
                             ticks: {
                                 color: '#a0aec0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Total Score',
+                                color: '#a0aec0'
                             }
                         },
                         x: {
@@ -1473,6 +1834,11 @@
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
+                                color: '#a0aec0'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date',
                                 color: '#a0aec0'
                             }
                         }
@@ -1489,11 +1855,6 @@
             initCharts();
         }
         
-        function calculateOneRepMax(weight, reps) {
-            // Epley formula
-            return weight * (1 + reps / 30);
-        }
-        
         function updateStats() {
             // Calculate max weight
             if (workouts.length > 0) {
@@ -1503,13 +1864,13 @@
                 document.getElementById('maxWeight').textContent = maxWeightWorkout.weight + ' kg';
                 document.getElementById('maxWeightExercise').textContent = maxWeightWorkout.exercise;
                 
-                // Calculate one rep max
-                const oneRepMax = calculateOneRepMax(maxWeightWorkout.weight, maxWeightWorkout.reps);
-                document.getElementById('oneRepMax').textContent = oneRepMax.toFixed(1) + ' kg';
+                // Calculate current performance score
+                const latestWorkout = workouts[0];
+                document.getElementById('performanceScore').textContent = latestWorkout.performanceScore;
             } else {
                 document.getElementById('maxWeight').textContent = '0 kg';
                 document.getElementById('maxWeightExercise').textContent = '-';
-                document.getElementById('oneRepMax').textContent = '0 kg';
+                document.getElementById('performanceScore').textContent = '0';
             }
             
             // Calculate workouts this month
@@ -1533,13 +1894,15 @@
                 return;
             }
             
-            // Group by exercise and find max weight
+            // Group by exercise and find max performance score
             const prs = {};
             workouts.forEach(workout => {
-                if (!prs[workout.exercise] || workout.weight > prs[workout.exercise].weight) {
+                const performanceScore = parseFloat(workout.performanceScore);
+                if (!prs[workout.exercise] || performanceScore > prs[workout.exercise].performanceScore) {
                     prs[workout.exercise] = {
                         weight: workout.weight,
                         reps: workout.reps,
+                        performanceScore: performanceScore,
                         date: workout.date
                     };
                 }
@@ -1548,11 +1911,16 @@
             // Display PRs
             Object.keys(prs).forEach(exercise => {
                 const pr = prs[exercise];
+                const exerciseIcon = exerciseIcons[exercise] || "fa-dumbbell";
+                
                 const prEl = document.createElement('div');
-                prEl.className = 'workout-item';
+                prEl.className = 'workout-item fade-in';
                 prEl.innerHTML = `
                     <div class="workout-header">
-                        <div class="workout-exercise">${exercise}</div>
+                        <div class="workout-exercise">
+                            <i class="fas ${exerciseIcon}"></i>
+                            ${exercise}
+                        </div>
                         <div class="workout-date">${formatDate(pr.date)}</div>
                     </div>
                     <div class="workout-details">
@@ -1565,8 +1933,8 @@
                             <div class="detail-label">Reps</div>
                         </div>
                         <div class="workout-detail">
-                            <div class="detail-value">${calculateOneRepMax(pr.weight, pr.reps).toFixed(1)}</div>
-                            <div class="detail-label">1RM</div>
+                            <div class="detail-value">${pr.performanceScore}</div>
+                            <div class="detail-label">Score</div>
                         </div>
                     </div>
                 `;
@@ -1579,7 +1947,7 @@
                 const dataStr = JSON.stringify(workouts, null, 2);
                 const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
                 
-                const exportFileDefaultName = 'lifelog-workouts.json';
+                const exportFileDefaultName = 'wlift-workouts.json';
                 
                 const linkElement = document.createElement('a');
                 linkElement.setAttribute('href', dataUri);
@@ -1593,7 +1961,7 @@
                 
                 // Add title
                 doc.setFontSize(22);
-                doc.text('WLift Pro - Workout Report', 105, 20, null, null, 'center');
+                doc.text('WLift - Workout Report', 105, 20, null, null, 'center');
                 
                 // Add subtitle
                 doc.setFontSize(14);
@@ -1628,7 +1996,7 @@
                             yPos = 20;
                         }
                         
-                        doc.text(`${formatDate(workout.date)} - ${workout.exercise}: ${workout.weight} kg x ${workout.reps}`, 20, yPos + 5);
+                        doc.text(`${formatDate(workout.date)} - ${workout.exercise}: ${workout.weight} kg x ${workout.reps} (Score: ${workout.performanceScore})`, 20, yPos + 5);
                         yPos += 10;
                     });
                 } else {
@@ -1636,13 +2004,13 @@
                 }
                 
                 // Save the PDF
-                doc.save('lifelog-report.pdf');
+                doc.save('wlift-report.pdf');
                 showToast('PDF report generated!');
             } else if (type === 'csv') {
-                let csvContent = "Date,Exercise,Weight (kg),Reps,Focus on Form,Hurt,Notes\n";
+                let csvContent = "Date,Exercise,Weight (kg),Reps,Performance Score,Focus on Form,Hurt,Notes\n";
                 
                 workouts.forEach(workout => {
-                    csvContent += `"${workout.date}","${workout.exercise}",${workout.weight},${workout.reps},"${workout.focusOnForm ? 'Yes' : 'No'}","${workout.hurt ? 'Yes' : 'No'}","${workout.notes.replace(/"/g, '""')}"\n`;
+                    csvContent += `"${workout.date}","${workout.exercise}",${workout.weight},${workout.reps},${workout.performanceScore},"${workout.focusOnForm ? 'Yes' : 'No'}","${workout.hurt ? 'Yes' : 'No'}","${workout.notes.replace(/"/g, '""')}"\n`;
                 });
                 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1650,7 +2018,7 @@
                 const url = URL.createObjectURL(blob);
                 
                 link.setAttribute("href", url);
-                link.setAttribute("download", "lifelog-workouts.csv");
+                link.setAttribute("download", "wlift-workouts.csv");
                 link.style.visibility = 'hidden';
                 
                 document.body.appendChild(link);
@@ -1675,6 +2043,7 @@
                     updateCharts();
                     updateStats();
                     updatePersonalRecords();
+                    populateExerciseFilters();
                     showToast('Data imported successfully!');
                 } catch (error) {
                     showToast('Error importing data!', 'error');
@@ -1721,16 +2090,6 @@
                 month: 'short', 
                 day: 'numeric' 
             });
-        }
-        
-        function getLastNDays(n) {
-            const dates = [];
-            for (let i = n - 1; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                dates.push(date.toISOString().split('T')[0]);
-            }
-            return dates;
         }
         
         function getRandomColor() {
@@ -1784,10 +2143,57 @@
         
         clearDataBtn.addEventListener('click', clearData);
         
+        // Exercise filter change
+        exerciseFilter.addEventListener('change', () => {
+            currentExerciseFilter = exerciseFilter.value;
+            renderWorkouts();
+        });
+        
+        // Chart view mode toggle
+        allViewBtn.addEventListener('click', () => {
+            chartViewMode = "all";
+            allViewBtn.classList.add('active');
+            exerciseViewBtn.classList.remove('active');
+            chartExerciseFilter.style.display = 'none';
+            updateCharts();
+        });
+        
+        exerciseViewBtn.addEventListener('click', () => {
+            chartViewMode = "exercise";
+            exerciseViewBtn.classList.add('active');
+            allViewBtn.classList.remove('active');
+            chartExerciseFilter.style.display = 'block';
+            updateCharts();
+        });
+        
+        // Chart exercise filter change
+        chartExerciseFilter.addEventListener('change', () => {
+            updateCharts();
+        });
+        
+        // Time range selector
+        timeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options
+                timeOptions.forEach(opt => opt.classList.remove('active'));
+                
+                // Add active class to clicked option
+                option.classList.add('active');
+                
+                // Set current time range
+                currentTimeRange = option.dataset.days;
+                
+                // Update charts
+                updateCharts();
+            });
+        });
+        
         // Initialize
         createParticles();
+        populateExerciseDropdown();
         renderWorkouts();
         renderCustomExercises();
+        populateExerciseFilters();
         initCharts();
         updateStats();
         updatePersonalRecords();
